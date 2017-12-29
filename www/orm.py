@@ -3,6 +3,10 @@
 # Python基础-编写 数据库增删改查 ORM
 import logging; logging.basicConfig(level = logging.INFO)
 import asyncio
+import aiomysql
+
+def log(sql, args=()):
+	logging.info('SQL: %s' % sql)
 
 # 创建连接池
 @asyncio.coroutine
@@ -14,8 +18,8 @@ def create_pool(loop, **kw):
 		host = kw.get("host", "localhost"),
 		port = kw.get("port", 3306),
 		user = kw["user"],
-		password = kw["123456"],
-		db = kw["db"],
+		password = kw["password"],
+		db = kw["database"],
 		# 防止乱码
 		charset = kw.get("charset", "utf8"),
 		# True 表示不需要在commit提交事务
@@ -248,7 +252,7 @@ class Field(object):
 
 class StringField(Field):
 
-	def __init(self, name = None, primary_key = False, default = None, ddl = "varchar(100)"):
+	def __init__(self, name = None, primary_key = False, default = None, ddl = "varchar(100)"):
 		super().__init__(name, ddl, primary_key, default)
 
 
