@@ -15,8 +15,8 @@ def create_pool(loop, **kw):
 	# 全局的连接池
 	global __pool
 	__pool = yield from aiomysql.create_pool(
-		host = kw.get("host", "localhost"),
-		port = kw.get("port", 3306),
+		host = kw.get("host", "127.0.0.1"),
+		port = kw.get("port", 9000),
 		user = kw["user"],
 		password = kw["password"],
 		db = kw["database"],

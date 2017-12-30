@@ -54,16 +54,86 @@ def datetime_filter(t):
 	dt = datetime.fromtimestamp(t)
 	return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
 
-def index(request):
-	# 网页显示 Web App
-	return web.Response(body = b"Web App")
+@asyncio.coroutine
+def logger_factory(app, handler):
+
+	@asyncio.coroutine
+	def logger(request):
+		logging.info('Request: %s %s' % (request.method, request.path))
+		return (yield from handler(request))
+	return logger
+
+@asyncio.coroutine
+def data_factory(app, handler):
+
+	@asyncio.coroutine
+	def parse_data(request):
+		if request.method == 'POST':
+			if request.content_type.startswith('application/json'):
+				request.__data__ = yield from request.json()
+				logging.info('request json: %s' % str(request.__data__))
+			elif request.content_type.startswith('application/x-www-form-urlencoded'):
+				request.__data__ = yield from request.post()
+				logging.info('request form: %s' % str(request.__data__))
+
+		return (yield from handler(request))
+	return parse_data
+
+@asyncio.coroutine
+def response_factory(app, handler):
+
+	@asyncio.coroutine
+	def response(request):
+		logging.info('Response handler...')
+		r = yield from handler(request)
+		if isinstance(r, web.StreamResponse):
+			return r
+
+		if isinstance(r, bytes):
+			resp = web.Response(body=r)
+			resp.content_type = 'application/octet-stream'
+			return resp
+
+		if isinstance(r, str):
+			if r.startswith('redirect:'):
+				return web.HTTPFound(r[9:])
+
+			resp = web.Response(body=r.encode('utf-8'))
+			resp.content_type = 'text/html;charset=utf-8'
+			return resp
+
+		if isinstance(r, dict):
+			template = r.get('__template__')
+			if template is None:
+				resp = web.Response(body=json.dumps(r, ensure_ascii=False, default=lambda o: o.__dict__).encode('utf-8'))
+				resp.content_type = 'application/json;charset=utf-8'
+				return resp
+			else:
+				resp = web.Response(body=app['__templating__'].get_template(template).render(**r).encode('utf-8'))
+				resp.content_type = 'text/html;charset=utf-8'
+				return resp
+
+		if isinstance(r, int) and r >= 100 and r < 600:
+			return web.Response(r)
+		if isinstance(r, tuple) and len(r) == 2:
+			t, m = r
+			if isinstance(t, int) and t >= 100 and t < 600:
+				return web.Response(t, str(m))
+		# default:
+		resp = web.Response(body=str(r).encode('utf-8'))
+		resp.content_type = 'text/plain;charset=utf-8'
+		return resp
+	return response
 
 @asyncio.coroutine
 def init(loop):
-	yield from orm.create_pool(loop = loop, host = "127.0.0.1", port = 9000, user = "root", password = "", database = "sufadi")
+	yield from orm.create_pool(loop = loop, host = "127.0.0.1", port = 3306, user = "root", password = "", database = "test")
 
 	#创建一个web服务器对象
-	app = web.Application(loop = loop)
+	app = web.Application(loop=loop, middlewares=[
+		logger_factory, response_factory
+    ])
+
 	#通过router的指定的方法可以把请求的链接和对应的处理函数关联在一起
 	init_jinja2(app, filters=dict(datetime = datetime_filter))
 	add_routes(app, "handlers")
@@ -77,4 +147,4 @@ def init(loop):
 # 固定写法
 loop = asyncio.get_event_loop()
 loop.run_until_complete(init(loop))
-#loop.run_forever()
+loop.run_forever()
