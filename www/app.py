@@ -11,6 +11,7 @@ import orm
 from aiohttp import web
 from coreweb import add_routes, add_static
 from jinja2 import Environment, FileSystemLoader
+from model import User, Blog, Comment
 
 def init_jinja2(app, **kw):
 	logging.info("初始化 jinja2")
@@ -127,7 +128,10 @@ def response_factory(app, handler):
 
 @asyncio.coroutine
 def init(loop):
-	yield from orm.create_pool(loop = loop, host = "127.0.0.1", port = 3306, user = "root", password = "", database = "test")
+	yield from orm.create_pool(loop = loop, host = "127.0.0.1", port = 3306, user = "root", password = "", database = "sufadi")
+
+	u = User(name = "Test", email = "test@sufadi.com", passwd = "123")
+	u.save()
 
 	#创建一个web服务器对象
 	app = web.Application(loop=loop, middlewares=[

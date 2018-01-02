@@ -41,39 +41,38 @@ def post(path):
 	
 def get_required_kw_args(fn):
 	args = []
-	params = inspect.sinature(fn).parameters
+	params = inspect.signature(fn).parameters
 	
 	for name, param in params.items():
 		if param.kind == inspect.Parameter.KEYWORD_ONLY and param.default == inspect.Parameter.empty:
 			args.append(name)
 	return tuple(args)
 
-def get_name_kw_args(fn):
+def get_named_kw_args(fn):
 	args = []
-	params = inspect.sinature(fn).parameters
+	params = inspect.signature(fn).parameters
 	
-	for name, param in param.items():
+	for name, param in params.items():
 		if param.kind == inspect.Parameter.KEYWORD_ONLY:
 			args.append(name)
 	return tuple(args)
 	
-def has_name_kw_args(fn):
-	params = inspect.sinature(fn).parameters
+def has_named_kw_args(fn):
+	params = inspect.signature(fn).parameters
 	
 	for name, param in params.items():
 		if param.kind == inspect.Parameter.KEYWORD_ONLY:
 			return True
 
-def ha_var_kw_arg(fn):
-	params = inspect(fn).parameters
+def has_var_kw_arg(fn):
+	params = inspect.signature(fn).parameters
 	
 	for name, param in params.items():
 		if param.kind == inspect.Parameter.VAR_KEYWORD:
 			return True
 
 def has_request_arg(fn):
-	sig = inspect.sinature(fn)
-	param = sig.parameters
+	param = inspect.signature(fn).parameters
 	found = False
 	
 	for name, param in param.items():
@@ -94,8 +93,8 @@ class RequestHandler(object):
 		self._has_request_arg = has_request_arg(fn)
 		self._has_var_kw_arg = has_var_kw_arg(fn)
 		self._has_named_kw_args = has_named_kw_args(fn)
-		self._named_kw_args = named_kw_args(fn)
-		self._required_kw_args = _required_kw_args(fn)
+		self._named_kw_args = get_named_kw_args(fn)
+		self._required_kw_args = get_required_kw_args(fn)
 	
 	# 异步
 	@asyncio.coroutine
@@ -172,7 +171,7 @@ def add_route(app, fn):
 		raise ValueError('@get or @post 未定义 in %s.' % str(fn))
 	
 	if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
-		fn = asyncio.coroutine(n)
+		fn = asyncio.coroutine(fn)
 	logging.info('add route %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
 	app.router.add_route(method, path, RequestHandler(app, fn))
 

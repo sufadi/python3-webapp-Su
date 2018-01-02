@@ -7,12 +7,12 @@ import orm
 import asyncio
 from model import User, Blog, Comment
 
+@asyncio.coroutine
 def test(loop):
-	yield from orm.create_pool(loop = loop, user = "root", password="", database = "sudfadi")
+	yield from orm.create_pool(loop = loop, host = "127.0.0.1", port = 3306, user = "root", password = "", database = "sufadi")
 
-	u = User(name = "Test", email = "test@sufadi.com", passwd = "123", image = "about:blank")
-
-	yield from u.save()
+	u = User(name = "Test", email = "test@sufadi.com", passwd = "123")
+	u.save()
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(test(loop))
