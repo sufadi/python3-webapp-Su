@@ -13,7 +13,7 @@ class APIError(Exception):
 		super(APIError, self).__init__(message)
 		self.error = error
 		self.data = data
-		elf.message = message
+		self.message = message
 
 class APIValueError(APIError):
 	'''

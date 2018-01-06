@@ -130,9 +130,6 @@ def response_factory(app, handler):
 def init(loop):
 	yield from orm.create_pool(loop = loop, host = "127.0.0.1", port = 3306, user = "root", password = "", database = "sufadi")
 
-	u = User(name = "Test", email = "test@sufadi.com", passwd = "123")
-	u.save()
-
 	#创建一个web服务器对象
 	app = web.Application(loop=loop, middlewares=[
 		logger_factory, response_factory
