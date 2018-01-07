@@ -1,4 +1,4 @@
-�?  # !/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Python基础-测试 orm
 
@@ -13,9 +13,9 @@ class User(Model):
 
 @asyncio.coroutine
 def runTest():
-    user = User(id=123, name="王大�?")
+    user = User(id=123, name="王大�??")
     yield from user.save()
-    yield from user.findAll("王大�?")
+    yield from user.findAll("王大�??")
     print(user)
 
 runTest()

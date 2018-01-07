@@ -1,4 +1,4 @@
-�?  # model.py
+# model.py
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Python基础-model模块

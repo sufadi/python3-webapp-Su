@@ -1,6 +1,5 @@
-�?  # !/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Python基础- 配置文件[�?有配置读取的统一]
 import config_default
 
 
@@ -16,7 +15,7 @@ class Dict(dict):
         try:
             return self[key]
         except KeyError:
-            raise AttributeError(r"Dict 内有该属�? %s" % key)
+            raise AttributeError(r"'Dict' object has no attribute '%s'" % key)
 
     def __setattr__(self, key, value):
         self[key] = value
