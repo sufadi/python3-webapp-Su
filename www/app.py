@@ -122,15 +122,15 @@ async def response_factory(app, handler):
 def datetime_filter(t):
     delta = int(time.time() - t)
     if delta < 60:
-        return u'1分钟�?'
+        return u'1分钟'
     if delta < 3600:
-        return u'%s分钟�?' % (delta // 60)
+        return u'%s分钟' % (delta // 60)
     if delta < 86400:
-        return u'%s小时�?' % (delta // 3600)
+        return u'%s小时' % (delta // 3600)
     if delta < 604800:
         return u'%s天前' % (delta // 86400)
     dt = datetime.fromtimestamp(t)
-    return u'%s�?%s�?%s�?' % (dt.year, dt.month, dt.day)
+    return u'%s-%s-%s' % (dt.year, dt.month, dt.day)
 
 async def init(loop):
     await orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='root', password='', db='sufadi')
@@ -138,11 +138,11 @@ async def init(loop):
         logger_factory, response_factory
     ])
 
-    # 通过router的指定的方法可以把请求的链接和对应的处理函数关联在一�?
+    # 通过router的指定的方法可以把请求的链接和对应的处理函数关联在
     init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
-    # 运行web服务�?,服务器启动后,有用户在浏览器访�?,就可以做出对应的响应
+    # 运行web服务,服务器启动后,有用户在浏览器访?,就可以做出对应的响应
     # 127.0.0.1 本机地址
     srv = await loop.create_server(app.make_handler(), '127.0.0.1', 9000)
     logging.info('server started at http://127.0.0.1:9000...')
