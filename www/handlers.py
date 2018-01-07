@@ -2,16 +2,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import re, time, json, logging, hashlib, base64, asyncio
+import re
+import time
+import json
+import logging
+import hashlib
+import base64
+import asyncio
 from coreweb import get, post
 from model import User, Comment, Blog, next_id
 
 'url handlers'
-@get("/")
-@asyncio.coroutine
-def index(request):
-	users = yield from User.findAll()
-	return {
-		"__template__":"home.html",
-		'users': users
-	}
+
+
+@get('/')
+async def index(request):
+    logging.info('handlers.py handlers index: %s' % request)
+    users = await User.findAll()
+    return {
+        "__template__": "home.html",
+        'users': users
+    }
