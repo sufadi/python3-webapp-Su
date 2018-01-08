@@ -30,3 +30,12 @@ def index(request):
         '__template__': 'blogs.html',
         'blogs': blogs
     }
+
+
+@get('/api/users')
+def api_get_users():
+    users = yield from User.findAll(orderBy='created_at desc')
+    for u in users:
+        # 浏览器显示 ******
+        u.passwd = '******'
+    return dict(users=users)
