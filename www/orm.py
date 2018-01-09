@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Python基础-编写 数据库增删改�?? ORM
+# Python基础-编写 数据库增删改�?? ORM
 import logging
 logging.basicConfig(level=logging.INFO)
 import asyncio
@@ -141,22 +141,16 @@ class ModelMetaclass(type):
             attrs.pop(k)
 
         escaped_fields = list(map(lambda f: '`%s`' % f, fields))
-        attrs['__mappings__'] = mappings  # 保存属�?�和列的映射关系
+        attrs['__mappings__'] = mappings
         attrs['__table__'] = tableName
-        attrs['__primary_key__'] = primaryKey  # 主键属�?�名
-        attrs['__fields__'] = fields  # 除主键外的属性名
-        attrs['__select__'] = 'select `%s`, %s from `%s`' % (
-            primaryKey, ', '.join(escaped_fields), tableName)
-        attrs['__insert__'] = 'insert into `%s` (%s, `%s`) values (%s)' % (tableName, ', '.join(
-            escaped_fields), primaryKey, create_args_string(len(escaped_fields) + 1))
-        attrs['__update__'] = 'update `%s` set %s where `%s`=?' % (tableName, ', '.join(
-            map(lambda f: '`%s`=?' % (mappings.get(f).name or f), fields)), primaryKey)
-        attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (
-            tableName, primaryKey)
+        attrs['__primary_key__'] = primaryKey
+        attrs['__fields__'] = fields
+        attrs['__select__'] = 'select `%s`, %s from `%s`' % (primaryKey, ', '.join(escaped_fields), tableName)
+        attrs['__insert__'] = 'insert into `%s` (%s, `%s`) values (%s)' % (tableName, ', '.join(escaped_fields), primaryKey, create_args_string(len(escaped_fields) + 1))
+        attrs['__update__'] = 'update `%s` set %s where `%s`=?' % (tableName, ', '.join(map(lambda f: '`%s`=?' % (mappings.get(f).name or f), fields)), primaryKey)
+        attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (tableName, primaryKey)
         return type.__new__(cls, name, bases, attrs)
 
-
-# 定义 Model
 class Model(dict, metaclass=ModelMetaclass):
 
     def __init__(self, **kw):

@@ -19,8 +19,7 @@ def next_id():
 
 
 class User(Model):
-    # 表名
-    __table__ = "users"
+    __table__ = 'users'
 
     # 数据-字段
     id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
