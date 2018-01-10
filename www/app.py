@@ -18,6 +18,8 @@ from jinja2 import Environment, FileSystemLoader
 from model import User, Blog, Comment
 
 
+from handlers import cookie2user, COOKIE_NAME
+
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
     options = dict(
@@ -40,6 +42,7 @@ def init_jinja2(app, **kw):
             env.filters[name] = f
     app['__templating__'] = env
 
+
 @asyncio.coroutine
 def logger_factory(app, handler):
     @asyncio.coroutine
@@ -48,6 +51,23 @@ def logger_factory(app, handler):
         # yield from asyncio.sleep(0.3)
         return (yield from handler(request))
     return logger
+
+@asyncio.coroutine
+def auth_factory(app, handler):
+    @asyncio.coroutine
+    def auth(request):
+        logging.info('check user: %s %s' % (request.method, request.path))
+        request.__user__ = None
+        cookie_str = request.cookies.get(COOKIE_NAME)
+        if cookie_str:
+            user = yield from cookie2user(cookie_str)
+            if user:
+                logging.info('set current user: %s' % user.email)
+                request.__user__ = user
+        if request.path.startswith('/manage/') and (request.__user__ is None or not request.__user__.admin):
+            return web.HTTPFound('/signin')
+        return (yield from handler(request))
+    return auth
 
 @asyncio.coroutine
 def data_factory(app, handler):
@@ -62,6 +82,7 @@ def data_factory(app, handler):
                 logging.info('request form: %s' % str(request.__data__))
         return (yield from handler(request))
     return parse_data
+
 
 @asyncio.coroutine
 def response_factory(app, handler):
@@ -94,6 +115,7 @@ def response_factory(app, handler):
                 logging.info('isinstance dict None % resp' % resp)
                 return resp
             else:
+                r['__user__'] = request.__user__
                 resp = web.Response(body=app['__templating__'].get_template(template).render(**r).encode('utf-8'))
                 resp.content_type = 'text/html;charset=utf-8'
                 logging.info('isinstance dict templating % resp' % resp)
@@ -127,14 +149,15 @@ def datetime_filter(t):
     dt = datetime.fromtimestamp(t)
     return u'%s-%s-%s' % (dt.year, dt.month, dt.day)
 
+
 @asyncio.coroutine
 def init(loop):
     yield from orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='root', password='', db='sufadi')
     app = web.Application(loop=loop, middlewares=[
-        logger_factory, response_factory
+        logger_factory, auth_factory, response_factory
     ])
 
-    # 通过router的指定的方法可以把请求的链接和对应的处理函数关联在
+    # 通过router的指定的方法可以把请求的链接和对应的处理函数关联�?
     init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)

@@ -8,11 +8,11 @@ import uuid
 
 from orm import Model, StringField, BooleanField, FloatField, TextField
 
-# 主键的缺省
+# 主键的缺�?
 
 
 def next_id():
-    # time.time 设置当前日期和时间
+    # time.time 设置当前日期和时�?
     return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
 
 # 建立数据库表 users
