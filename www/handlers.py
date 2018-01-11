@@ -48,7 +48,8 @@ def user2cookie(user, max_age):
 
 
 def text2html(text):
-    lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<','&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
+    lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<',
+                                                                        '&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
     return ''.join(lines)
 
 
@@ -94,9 +95,8 @@ def index(request):
         Blog(id='3', name='谌铁柱的期权变现走向人生巅峰', summary=summary,
              created_at=time.time() - 7200)
     ]
-    users = [User(id = '0015155975126352ddb8d8a9f554f64afe22d1c0a50babf000'
-                  ,email = 'su@123.com'
-                  ,name = 'su')]
+    users = [User(id='0015155975126352ddb8d8a9f554f64afe22d1c0a50babf000',
+                  email='su@123.com', name='su')]
     return {
         '__template__': 'blogs.html',
         'blogs': blogs
@@ -167,7 +167,7 @@ def signout(request):
     return r
 
 
-@get('/manage/blogs/create')
+@get('/manage_blogs_create')
 def manage_create_blog():
     return {
         '__template__': 'manage_blog_edit.html',
