@@ -1,5 +1,3 @@
-Python的博客开发项目
-
 # 一、UI 效果
 ### 1. Web 端 
 #### 1.1 主页
@@ -32,3 +30,19 @@ Python的博客开发项目
 
 #### 3.4 数据库表-评论表
 ![数据库表-评论表](http://img.blog.csdn.net/20180112201139871?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc3U3NDk1MjA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+### 4. Android 客户端
+![Android 客户端](http://img.blog.csdn.net/20180113143556460?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc3U3NDk1MjA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+相关博客
+http://blog.csdn.net/su749520/article/details/79051588
+
+# 二、相关博客
+### 2.1 廖雪峰的 Blog
+https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000
+
+### 2.2 本人的 Python CSDN
+http://blog.csdn.net/su749520/article/category/7326472
+
+### 2.3 项目
+https://github.com/sufadi/python3-webapp-Su
