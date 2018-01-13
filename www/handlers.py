@@ -83,22 +83,18 @@ def cookie2user(cookie_str):
         logging.exception(e)
         return None
 
-
 @get('/')
-def index(request):
-    summary = 'Python学习小组-王大锤，谌铁柱，凌二蛋，苏总'
-    blogs = [
-        Blog(id='1', name='王大锤和美美的爱情故事', summary=summary,
-             created_at=time.time() - 120),
-        Blog(id='2', name='凌二蛋到底什么时候结婚', summary=summary,
-             created_at=time.time() - 3600),
-        Blog(id='3', name='谌铁柱的期权变现走向人生巅峰', summary=summary,
-             created_at=time.time() - 7200)
-    ]
-    users = [User(id='0015155975126352ddb8d8a9f554f64afe22d1c0a50babf000',
-                  email='su@123.com', name='su')]
+def index(*, page='1'):
+    page_index = get_page_index(page)
+    num = yield from Blog.findNumber('count(id)')
+    page = Page(num)
+    if num == 0:
+        blogs = []
+    else:
+        blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(page.offset, page.limit))
     return {
         '__template__': 'blogs.html',
+        'page': page,
         'blogs': blogs
     }
 
@@ -290,6 +286,11 @@ def api_blogs(*, page='1'):
         return dict(page=p, blogs=())
     blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, blogs=blogs)
+
+@get('/api/blogs/all')
+def api_blogs(*, page='1'):
+    blogs = yield from Blog.findAll(orderBy='created_at desc')
+    return dict(blogs=blogs)
 
 @get('/api/blogs/{id}')
 def api_get_blog(*, id):
